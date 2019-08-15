@@ -2,7 +2,7 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-13 16:58:09
- * @LastEditTime: 2019-08-15 16:17:39
+ * @LastEditTime: 2019-08-15 17:50:00
  * @LastEditors: Please set LastEditors
  -->
 <!DOCTYPE html>
@@ -28,7 +28,7 @@
         <a href="#" class="logo"><img src="images/logo02.png" alt="logo"></a>
         <div class="user_info">
             <img src="images/2.jpg" alt="person">
-            <span>欢迎&nbsp;&nbsp;李思思</span>
+            <span>欢迎&nbsp;&nbsp;兰兰</span>
             <b>管理员</b>
         </div>
         <div class="menu">
@@ -146,6 +146,9 @@
             //给退出a标签设置一个点击事件
             $('.icon-tuichu').parent().on('click', function (e) {
                 e.preventDefault();//阻止a标签的默认跳转
+                
+                //没有使用弹出模态框之前操作
+
                 // if (confirm('你确定要退出吗?')) {
                 //     //发送ajax请求
                 //     $.ajax({
@@ -161,6 +164,9 @@
                 //     });
 
                 // }
+
+
+                //使用模态框后的操作
                 $('.modal-body').text('你确定要退出吗？');
                 $('#myModal').modal({
                     keyboard: true
@@ -180,6 +186,23 @@
 
                 });
             });
+
+
+            //需求：在首页显示登录人信息
+            //发送ajax请求
+            $.ajax({
+                type:'get',
+                url:'http://localhost:8080/admin/user/info',
+                success:function(backData){
+                    console.log(backData);
+                    if(backData.code==200){   
+                        $('.user_info>img').attr('src',backData.data.userPic);
+                        $('.user_info>span').html('欢迎&nbsp;&nbsp;'+backData.data.nickname);
+                        $('.user_center_link>img').attr('src',backData.data.userPic);
+                    };
+                }
+            });
+            
         });
 
     </script>
