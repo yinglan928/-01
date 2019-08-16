@@ -2,7 +2,7 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-13 14:59:13
- * @LastEditTime: 2019-08-15 20:37:05
+ * @LastEditTime: 2019-08-16 15:27:58
  * @LastEditors: Please set LastEditors
  -->
 <!DOCTYPE html>
@@ -31,19 +31,19 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control username" value="李思思">
+                        <input type="text" class="form-control username" name='username' value="李思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control nickname" value="思思">
+                        <input type="text" class="form-control nickname" name='nickname' value="思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control email" value="lisisi@126.com">
+                        <input type="text" class="form-control email" name='email' value="lisisi@126.com">
                     </div>
                 </div>
 
@@ -51,14 +51,15 @@
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
                         <img src="images/2.jpg" alt="" class="user_pic">
-                        <input type="file" id="exampleInputFile">
+                        <input type="file" name="userPic" id="exampleInputFile">
+                        <!-- name="userPic"要给到input -->
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
                     <div class="col-sm-4">
-                        <input type="password" class="form-control password" value="12345678">
+                        <input type="password" class="form-control password" name='password' value="12345678">
                     </div>
                 </div>
 
@@ -74,13 +75,13 @@
     <script>
         //入口函数
         $(function () {
-            //需求页面一进入到个人中心就显示登录人得信息
+            //需求页面一进入到个人中心就显示登录人的信息
             //1、发送ajax请求，将返回回来的数据写在相应的标签上
             $.ajax({
                 type: 'get',
                 url: 'http://localhost:8080/admin/user/detail',
                 success: function (backData) {
-                    console.log(backData);
+                    // console.log(backData);
                     $('input.username').val(backData.data.username);
                     $('input.nickname').val(backData.data.nickname);
                     $('input.email').val(backData.data.email);
@@ -89,7 +90,54 @@
                 }
             });
 
-            
+            //修改用户信息
+            //1、先给input file 设置值改变事件
+            $('#exampleInputFile').on('change', function () {
+                //1、获取选中的文件
+                var pc_icon = this.files[0]//永远只拿到一个文件
+                //2、给input file选择的文件创建一个路径
+                var url = URL.createObjectURL(pc_icon);
+                //3、把url路径给到img的src
+                $('img.user_pic').attr('src', url);
+            });
+
+            //1、修改好信息后，给修改按钮设置点击事件
+            $('.btn-success').on('click', function (e) {
+                e.preventDefault();//阻止表单元素的默认跳转事件
+                //2、获取用户填入的信息，是一个FormData对象
+                var fd = new FormData($('form')[0]);
+                //3、发送ajax请求
+                $.ajax({
+                    type: 'post',
+                    url: 'http://localhost:8080/admin/user/edit',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function (backData) {
+                        // console.log(backData);
+                        if (backData.code == 200) {
+                            alert('修改成功！');
+                            //第一种方案：修改成功后，更新登录人信息(由于修改信息部分是用iframe打开的)
+                            // parent.window.location.reload();
+                            //第二种方案：修改成功后，发送ajax请求，留在当前页面，并且首页的登录人信息做相应更改
+                            // 发送ajax请求获取用户信息，填到对应的标签上，显示新的数据
+                            $.ajax({
+                                type: 'get',
+                                url: 'http://localhost:8080/admin/user/detail',
+                                success: function (backData) {
+                                    console.log(backData);
+                                    if (backData.code == 200) {
+                                        parent.$('.user_info>img').attr('src', backData.data.userPic);
+                                        parent.$('.user_info>span').html('欢迎&nbsp;&nbsp;' + backData.data.nickname);
+                                        parent.$('.user_center_link>img').attr('src', backData.data.userPic);
+                                    };
+                                }
+                            });
+                        };
+
+                    }
+                });
+            });
         });
     </script>
 </body>
