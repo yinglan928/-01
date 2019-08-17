@@ -2,7 +2,7 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-13 16:58:06
- * @LastEditTime: 2019-08-17 15:05:41
+ * @LastEditTime: 2019-08-17 15:08:22
  * @LastEditors: Please set LastEditors
  -->
 <!DOCTYPE html>
@@ -192,7 +192,7 @@
                         success: function (backData) {
                             console.log(backData);
                             if (backData.code == 204) {
-                                getData();
+                                getData();//删除后重新渲染，或者删除dom树
                             };
                         }
                     });
@@ -300,7 +300,7 @@
                         success: function (backData) {
                             console.log(backData);
                             if (backData.code == 200) {
-                                getData();
+                                getData();//编辑成功后，重新渲染
                             };
                         }
                     });
